@@ -9,7 +9,7 @@
 ## 二、快速入门
 1、快速体验云游戏
 
-点击运行工程目录下的Demo文件夹, pod update 更新SDK库文件，运行此Demo可以快速体验云游示例，如果有疑问请参考[Demo运行说明](Demo/README.md)。
+进入Demo下的工程目录, **pod update** 更新SDK库文件，运行对应的工程即可快速体验云游示例，如果有疑问请参考[Demo运行说明](Demo/README.md)。
 
 2、端游快速接入
 
@@ -19,12 +19,7 @@
 
 如果您需要在您的应用中集成云手游的功能，请参考[手游接入文档](Doc/手游接入说明.md)。
 
-## 三、使用进阶
-1、自定义虚拟按键
-
-如果您需要为您的游戏添加对应的虚拟按键，您可以参考自定义虚拟按键接入文档。
-
-## 四、SDK集成
+## 三、SDK集成
 
 在Podfile中添加
 ```
@@ -35,5 +30,7 @@ pod 'TCGSDK', :git => "https://github.com/yujunleik/test_pod.git"
 
 你还可以查看SDK的发布历史，了解各版本的变更信息。
 
-## 五、相关链接
+## 四、相关链接
 [腾讯云云游戏解决方案](https://cloud.tencent.com/solution/gs)
+
+[构建端到端整体方案说明](https://docs.qq.com/doc/DSFBvWlhQTkVKZUlQ?wwapp_deviceid=bec61743-e9f5-4075-8f18-776a84374f56&wwapp_vid=1688850546831822&wwapp_cst=D3DCAAA8762E2D7554CAF70E75334B554A78709E24D3CD8E08DCAFFB909C1657D5168566444E3F1533E95090B7EED354)
