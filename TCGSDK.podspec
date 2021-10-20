@@ -5,7 +5,6 @@ Pod::Spec.new do |spec|
   spec.homepage     = 'https://github.com/tencentyun/cloudgame-ios-sdk'
   spec.summary      = 'Tencent Cloud Gaming Software Development Kit for iOS.'
   spec.authors      = { 'lyleyu' => 'lyleyu@tencent.com' }
-  # spec.source       = { :git => 'https://github.com/yujunleik/test_pod.git', :tag => "v#{spec.version}" }
   spec.source       = { :path => './' }
   spec.pod_target_xcconfig = {
     'ENABLE_BITCODE' => 'OFF'

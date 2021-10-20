@@ -7,7 +7,6 @@
 //
 
 #import "AppDelegate.h"
-//#import <TCGSDK/TCGSDK.h>
 #import "ViewController.h"
 
 @interface AppDelegate ()
@@ -22,8 +21,6 @@
     CGRect frame = [[UIScreen mainScreen] bounds];
     self.window = [[UIWindow alloc] initWithFrame:frame];
     self.window.rootViewController = [[ViewController alloc] init];
-//    TCGCustomTransChannel *channel = [[TCGCustomTransChannel alloc] init];
-//    [channel sendData:nil];
     [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
     return YES;
 }
