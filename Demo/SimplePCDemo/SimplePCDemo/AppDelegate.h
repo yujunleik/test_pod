@@ -1,6 +1,6 @@
 //
 //  AppDelegate.h
-//  TCGDemo
+//  SimplePCDemo
 //
 //  Created by LyleYu on 2021/10/19.
 //  Copyright © 2021 yujunlei. All rights reserved.

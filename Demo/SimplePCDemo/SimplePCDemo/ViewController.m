@@ -54,6 +54,7 @@ typedef void (^httpResponseBlk)(NSData * data, NSURLResponse * response, NSError
 }
 
 - (void)getRemoteSessionWithLocalSession:(NSString *)localSession {
+    // TODO: 这里的接口地址仅供Demo体验，请及时更换为自己的业务后台接口
     NSString *createSession = @"https://service-p82hxb0g-1251916719.gz.apigw.tencentcs.com/release/StartCloudGame";
     self.userId = [NSString stringWithFormat:@"SimplePC-%@", [[NSUUID UUID] UUIDString]];
     NSDictionary *params = @{@"GameId":@"game-nf771d1e", @"UserId":self.userId, @"ClientSession":localSession};
@@ -102,6 +103,7 @@ typedef void (^httpResponseBlk)(NSData * data, NSURLResponse * response, NSError
         if (self.userId.length == 0) {
             return;
         }
+        // TODO: 业务后台需要及时向腾讯云后台释放机器，避免资源浪费
         NSString *releaseSession = @"https://service-p82hxb0g-1251916719.gz.apigw.tencentcs.com/release/StopCloudGame";
         NSDictionary *params = @{@"UserId":self.userId};
         [self postUrl:releaseSession params:params finishBlk:^(NSData *data, NSURLResponse *response, NSError *error) {

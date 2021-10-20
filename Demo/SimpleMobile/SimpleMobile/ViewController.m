@@ -1,6 +1,6 @@
 //
 //  ViewController.m
-//  SimplePCDemo
+//  SimpleMobile
 //
 //  Created by LyleYu on 2021/10/19.
 //  Copyright © 2021 yujunlei. All rights reserved.
@@ -16,6 +16,7 @@ typedef void (^httpResponseBlk)(NSData * data, NSURLResponse * response, NSError
 @property(nonatomic, copy) NSString *userId;
 @property(nonatomic, strong) TCGGamePlayer *gamePlayer;
 @property(nonatomic, weak) TCGGameController *gameController;
+@property(nonatomic, strong) TCGRemoteTouchScreen *mobileTouch;
 
 @end
 
@@ -33,6 +34,11 @@ typedef void (^httpResponseBlk)(NSData * data, NSURLResponse * response, NSError
     [stopBtn addTarget:self action:@selector(stopGame) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:startBtn];
     [self.view addSubview:stopBtn];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(handleStatusBarOrientationChange:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)createGamePlayer {
@@ -46,6 +52,9 @@ typedef void (^httpResponseBlk)(NSData * data, NSURLResponse * response, NSError
 
     [self.gamePlayer.videoView setFrame:self.view.bounds];
     [self.view insertSubview:self.gamePlayer.videoView atIndex:0];
+
+    self.mobileTouch = [[TCGRemoteTouchScreen alloc] initWithFrame:self.gamePlayer.videoView.bounds controller:self.gameController];
+    [self.gamePlayer.videoView addSubview:self.mobileTouch];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -54,9 +63,10 @@ typedef void (^httpResponseBlk)(NSData * data, NSURLResponse * response, NSError
 }
 
 - (void)getRemoteSessionWithLocalSession:(NSString *)localSession {
+    // TODO: 这里的接口地址仅供Demo体验，请及时更换为自己的业务后台接口
     NSString *createSession = @"https://service-p82hxb0g-1251916719.gz.apigw.tencentcs.com/release/StartCloudGame";
     self.userId = [NSString stringWithFormat:@"SimplePC-%@", [[NSUUID UUID] UUIDString]];
-    NSDictionary *params = @{@"GameId":@"game-nf771d1e", @"UserId":self.userId, @"ClientSession":localSession};
+    NSDictionary *params = @{@"GameId":@"game-0qo599jg", @"UserId":self.userId, @"ClientSession":localSession};
     [self postUrl:createSession params:params finishBlk:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error != nil || data == nil) {
             NSLog(@"申请云端机器失败:%@", error.userInfo.description);
@@ -102,6 +112,7 @@ typedef void (^httpResponseBlk)(NSData * data, NSURLResponse * response, NSError
         if (self.userId.length == 0) {
             return;
         }
+        // TODO: 业务后台需要及时向腾讯云后台释放机器，避免资源浪费
         NSString *releaseSession = @"https://service-p82hxb0g-1251916719.gz.apigw.tencentcs.com/release/StopCloudGame";
         NSDictionary *params = @{@"UserId":self.userId};
         [self postUrl:releaseSession params:params finishBlk:^(NSData *data, NSURLResponse *response, NSError *error) {
@@ -115,15 +126,24 @@ typedef void (^httpResponseBlk)(NSData * data, NSURLResponse * response, NSError
 }
 
 - (void)onInitSuccess:(NSString *)localSession {
-    NSLog(@"SimplePCDemo onInitSuccess， 本地初始化成功");
+    NSLog(@"SimpleMobile onInitSuccess， 本地初始化成功");
     [self getRemoteSessionWithLocalSession:localSession];
 }
 
 - (void)onVideoSizeChanged:(CGSize)videoSize {
-    CGFloat newWidth = self.view.frame.size.width - [self.view safeAreaInsets].left - [self.view safeAreaInsets].right;
-    CGFloat newHeight = self.view.frame.size.height;
-    // 游戏画面强制横屏、设置游戏画面居中显示类似 UIViewContentModeScaleAspectFit
-    if (newWidth/newHeight < videoSize.width/videoSize.height) {
+    UIInterfaceOrientation vcOrient = [[UIApplication sharedApplication] statusBarOrientation];
+    CGFloat newWidth = 100;
+    CGFloat newHeight = 100;
+    if (vcOrient == UIInterfaceOrientationLandscapeRight) {
+        // 当手机横屏显示时，需要将videoView画面逆时钟旋转90度。
+        newWidth = self.view.frame.size.height;
+        newHeight = self.view.frame.size.width - [self.view safeAreaInsets].left;
+    } else {
+        newWidth = self.view.frame.size.width;
+        newHeight = self.view.frame.size.height - [self.view safeAreaInsets].top;
+    }
+    // 游戏画面固定为竖屏、设置游戏画面居中显示类似 UIViewContentModeScaleAspectFit
+    if (newWidth/newHeight > videoSize.width/videoSize.height) {
         newHeight = floor(newWidth * videoSize.height / videoSize.width);
     } else {
         newWidth = floor(newHeight * videoSize.width / videoSize.height);
@@ -131,18 +151,44 @@ typedef void (^httpResponseBlk)(NSData * data, NSURLResponse * response, NSError
     self.gamePlayer.videoView.frame = CGRectMake((self.view.frame.size.width - newWidth) / 2,
                                                  (self.view.frame.size.height - newHeight) / 2,
                                                  newWidth, newHeight);
+    [self.mobileTouch setFrame:self.gamePlayer.videoView.bounds];
+
+    if (vcOrient == UIInterfaceOrientationLandscapeRight) {
+        self.gamePlayer.videoView.transform = CGAffineTransformRotate(CGAffineTransformIdentity, -M_PI_2);
+    }
+}
+
+- (void)handleStatusBarOrientationChange:(NSNotification *)notification {
+    self.gamePlayer.videoView.center = self.view.center;
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    switch (orientation) {
+        case UIInterfaceOrientationPortrait:{
+            self.gamePlayer.videoView.transform = CGAffineTransformIdentity;
+        }
+            break;
+        case UIInterfaceOrientationLandscapeRight:{
+            self.gamePlayer.videoView.transform = CGAffineTransformRotate(CGAffineTransformIdentity, -M_PI_2);
+        }
+            break;
+        default:
+            break;
+    }
+}
+
+- (void)onVideoOrientationChanged:(UIInterfaceOrientation)orientation {
+    NSLog(@"onVideoOrientationChanged 游戏画面内容朝向改变:%tu", orientation);
 }
 
 - (void)onVideoShow {
-    NSLog(@"SimplePCDemo onVideoShow, 游戏开始有画面");
+    NSLog(@"SimpleMobile onVideoShow, 游戏开始有画面");
 }
 
 - (void)onConnectionFailure:(TCGErrorType)errorCode msg:(NSError *)errorMsg {
-    NSLog(@"SimplePCDemo onConnectionFailure");
+    NSLog(@"SimpleMobile onConnectionFailure");
 }
 
 - (void)onInitFailure:(TCGErrorType)errorCode msg:(NSError *)errorMsg {
-    NSLog(@"SimplePCDemo onInitFailure");
+    NSLog(@"SimpleMobile onInitFailure");
 }
 
 - (void)postUrl:(NSString *)url params:(NSDictionary *)params finishBlk:(httpResponseBlk)finishBlk {

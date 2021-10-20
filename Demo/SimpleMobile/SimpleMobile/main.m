@@ -1,6 +1,6 @@
 //
 //  main.m
-//  SimplePCDemo
+//  SimpleMobile
 //
 //  Created by LyleYu on 2021/10/19.
 //  Copyright © 2021 yujunlei. All rights reserved.
