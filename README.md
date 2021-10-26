@@ -19,16 +19,24 @@
 
 如果您需要在您的应用中集成云手游的功能，请参考[手游接入文档](Doc/手游接入说明.md)。
 
+4、虚拟按键快速接入
+
+如果您需要在您的应用中集成灵活可配置的游戏按键布局，请参考[虚拟接入文档](Doc/自定义虚拟按键.md)。
+
 ## 三、SDK集成
 
 在Podfile中添加
 ```
 pod 'TCGSDK', :git => "https://github.com/yujunleik/test_pod.git"
+
+# 虚拟按键可选库
+# pod 'TCGVKey', :git => "https://github.com/yujunleik/test_pod.git"
 ```
 
 我们会定期更新SDK的功能，您可以在本工程SDK目录下获取最新的版本。
 
 你还可以查看SDK的发布历史，了解各版本的变更信息。
+
 
 ## 四、相关链接
 [腾讯云云游戏解决方案](https://cloud.tencent.com/solution/gs)
