@@ -91,7 +91,7 @@ class ViewController: UIViewController {
         
         mouseCursor = TCGVirtualMouseCursor.init(frame: self.view.bounds, controller: gameController)
         // 设置默认的鼠标指针图片，防止后台未及时下放时显示空白
-        // TODO: 创建默认图片
+        mouseCursor?.setCursorImage(#imageLiteral(resourceName: "default_cursor"), andRemoteFrame: CGRect(x:0, y:0, width:32, height:32))
         if let cursor = mouseCursor {
             gamePlayer?.videoView().addSubview(cursor)
         }
